@@ -1,0 +1,6 @@
+export const generos={
+    DRAMA: "DRAMA",
+    CIENCIA_FICCION:"CIENCIA FICCION",
+    ROMANCE:"ROMANCE",
+    COMEDIA:"COMEDIA"
+}
