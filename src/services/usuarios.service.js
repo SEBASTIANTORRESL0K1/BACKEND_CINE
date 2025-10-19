@@ -39,3 +39,19 @@ export const deleteUsuario = async (id) => {
 export const comparePassword = async (password, receivedPassword) => {
     return await bcrypt.compare(password, receivedPassword);
 };
+
+export const loginUsuario = async (correo, contrasena) => {
+    const [rows] = await pool.query('SELECT * FROM USUARIOS WHERE correo = ?', [correo]);
+    if (rows.length === 0) {
+        return null; // Usuario no encontrado
+    }
+    const usuario = rows[0];
+    
+    const isMatch = await comparePassword(contrasena, usuario.contrasena);
+    
+    if (!isMatch) {
+        return null; // Contraseña incorrecta
+    }
+    
+    return usuario;
+};

@@ -1,5 +1,16 @@
 
 import * as usuariosService from '../services/usuarios.service.js';
+import jwt from 'jsonwebtoken';
+import { JWT_SECRET, JWT_EXPIRES_IN } from '../config.js';
+
+// Función para generar un token
+const generateToken = (usuario) => {
+    return jwt.sign(
+        { id: usuario.id_usuario, rol: usuario.rol }, // Payload
+        JWT_SECRET,
+        { expiresIn: JWT_EXPIRES_IN } // El token expira según la configuración
+    );
+};
 
 export const getUsuarios = async (req, res) => {
     try {
@@ -25,7 +36,22 @@ export const getUsuario = async (req, res) => {
 export const createUsuario = async (req, res) => {
     try {
         const newUsuario = await usuariosService.createUsuario(req.body);
-        res.status(201).json(newUsuario);
+        const token = generateToken(newUsuario);
+        res.status(201).json({ token });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const loginController = async (req, res) => {
+    const { correo, contrasena } = req.body;
+    try {
+        const usuario = await usuariosService.loginUsuario(correo, contrasena);
+        if (!usuario) {
+            return res.status(401).json({ message: 'Credenciales inválidas' });
+        }
+        const token = generateToken(usuario);
+        res.json({ token });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
