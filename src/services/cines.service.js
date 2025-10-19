@@ -3,16 +3,19 @@ import { pool } from '../database/database.js';
 
 export const obtenerTodosLosCines = async () => {
     const [rows] = await pool.query('SELECT * FROM CINES');
-    return rows;
+    const cines = rows.map(row => new Cine(row));
+    return cines;
 };
 
 export const obtenerCinePorId = async (id) => {
     const [rows] = await pool.query('SELECT * FROM CINES WHERE id_cine = ?', [id]);
-    return rows[0];
+    const cine= new Cine(rows[0]);
+    return cine;
 };
 export const obtenerCinesPorNombre = async (nombre_cine)=>{
     const [rows] = await pool.query('SELECT * FROM CINES WHERE nombre_cine LIKE ?', [`%${nombre_cine}%`]);
-    return rows;
+    const cines = rows.map(row => new Cine(row));
+    return cines;
 }
 
 export const crearCine = async (cineData) => {
@@ -23,12 +26,17 @@ export const crearCine = async (cineData) => {
 };
 
 export const actualizarCine = async (id, cine) => {
-    const { nombre_cine, codigo_postal } = cine;
-    await pool.query('UPDATE CINES SET nombre_cine = ?, codigo_postal = ? WHERE id_cine = ?', [nombre_cine, codigo_postal, id]);
+    const cineData = new Cine(cine);
+    await pool.query('UPDATE CINES SET nombre_cine = ?, codigo_postal = ? WHERE id_cine = ?', [cineData.nombre_cine, cineData.codigo_postal, id]);
     return { id_cine: id, ...cine };
 };
 
 export const eliminarCine = async (id) => {
     const [result] = await pool.query('DELETE FROM CINES WHERE id_cine = ?', [id]);
-    return result.affectedRows > 0;
+    console.log(result);
+    if (result.affectedRows > 0){
+        return true;
+    }else{
+        return false;
+    };
 };

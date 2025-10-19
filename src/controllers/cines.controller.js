@@ -1,7 +1,7 @@
 
 import * as cinesService from '../services/cines.service.js';
 
-export const getCines = async (req, res) => {
+export const obtenerTodosLosCines = async (req, res) => {
     try {
         const cines = await cinesService.obtenerTodosLosCines();
         res.json(cines);
@@ -10,9 +10,9 @@ export const getCines = async (req, res) => {
     }
 };
 
-export const getCine = async (req, res) => {
+export const obtenerCinePorId = async (req, res) => {
     try {
-        const cine = await cinesService.getCineById(req.params.id);
+        const cine = await cinesService.obtenerCinePorId(req.params.id);
         if (!cine) {
             return res.status(404).json({ message: 'Cine not found' });
         }
@@ -22,31 +22,33 @@ export const getCine = async (req, res) => {
     }
 };
 
-export const createCine = async (req, res) => {
+export const crearCine = async (req, res) => {
     try {
-        const newCine = await cinesService.createCine(req.body);
+        const newCine = await cinesService.crearCine(req.body);
         res.status(201).json(newCine);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-export const updateCine = async (req, res) => {
+export const actualizarCine = async (req, res) => {
     try {
-        const updatedCine = await cinesService.updateCine(req.params.id, req.body);
+        const updatedCine = await cinesService.actualizarCine(req.params.id, req.body);
         res.json(updatedCine);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-export const deleteCine = async (req, res) => {
+export const eliminarCine = async (req, res) => {
     try {
-        const result = await cinesService.deleteCine(req.params.id);
+        const result = await cinesService.eliminarCine(req.params.id);
         if (!result) {
             return res.status(404).json({ message: 'Cine not found' });
         }
-        res.sendStatus(204);
+        if(result){
+            res.status(200).json({message: 'Cine deleted' });
+        }
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
