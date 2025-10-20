@@ -12,3 +12,5 @@ export class Usuario{
         this.contrasena = contrasena;
     }
 }
+
+/*osmar */
