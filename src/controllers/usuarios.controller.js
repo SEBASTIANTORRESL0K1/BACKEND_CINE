@@ -50,8 +50,10 @@ export const loginController = async (req, res) => {
         if (!usuario) {
             return res.status(401).json({ message: 'Credenciales inválidas' });
         }
+        const rol = await usuariosService.obtenerRolPorIdUsuario(usuario.id_usuario);
+        usuario.rol = rol;
         const token = generateToken(usuario);
-        res.json({ token });
+        res.json({ token,rol });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

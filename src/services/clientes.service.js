@@ -1,4 +1,4 @@
-
+import { createUsuario, getUsuarioByCorreo } from './usuarios.service.js';
 import { pool } from '../database/database.js';
 
 export const getAllClientes = async () => {
@@ -12,7 +12,16 @@ export const getClienteById = async (id) => {
 };
 
 export const createCliente = async (cliente) => {
-    const { id_usuario, puntos, id_membresia, activo } = cliente;
+    const usuarioExistente = await getUsuarioByCorreo(cliente.correo);
+    let id_usuario;
+    if (usuarioExistente) {
+        id_usuario = usuarioExistente.id_usuario;
+    } else {
+        const usuario = await createUsuario(cliente);
+        id_usuario = usuario.id_usuario;
+    }
+
+    const { puntos, id_membresia, activo } = cliente;
     const [result] = await pool.query('INSERT INTO CLIENTES (id_usuario, puntos, id_membresia, activo) VALUES (?, ?, ?, ?)', [id_usuario, puntos, id_membresia, activo]);
     return { id_cliente: result.insertId, ...cliente };
 };

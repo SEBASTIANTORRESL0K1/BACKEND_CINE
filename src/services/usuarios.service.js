@@ -1,5 +1,7 @@
-
+import {ROLES} from '../constants/roles.js';
 import { pool } from '../database/database.js';
+import {createEmpleado} from './empleados.service.js';
+import {createCliente} from './clientes.service.js';
 import bcrypt from 'bcryptjs';
 
 export const getAllUsuarios = async () => {
@@ -11,9 +13,13 @@ export const getUsuarioById = async (id) => {
     const [rows] = await pool.query('SELECT * FROM USUARIOS WHERE id_usuario = ?', [id]);
     return rows[0];
 };
+export const getUsuarioByCorreo = async (correo) => {
+    const [rows] = await pool.query('SELECT * FROM USUARIOS WHERE correo = ?', [correo]);
+    return rows[0];
+};
 
 export const createUsuario = async (usuario) => {
-    const { nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, codigo_postal, numero_telefono, correo, contrasena } = usuario;
+    const { nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, codigo_postal, numero_telefono, correo, contrasena} = usuario;
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(contrasena, salt);
     const [result] = await pool.query('INSERT INTO USUARIOS (nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, codigo_postal, numero_telefono, correo, contrasena) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, codigo_postal, numero_telefono, correo, hashedPassword]);
@@ -55,3 +61,10 @@ export const loginUsuario = async (correo, contrasena) => {
     
     return usuario;
 };
+export const obtenerRolPorIdUsuario = async (id_usuario) => {
+    const [rows] = await pool.query('SELECT rol FROM EMPLEADOS WHERE id_usuario = ?', [id_usuario]);
+    if (rows.length > 0) {
+        return rows[0].rol;
+    }
+    return ROLES.CLIENTE; // Rol por defecto si no es empleado
+}

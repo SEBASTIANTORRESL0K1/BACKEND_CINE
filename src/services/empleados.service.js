@@ -1,5 +1,6 @@
-
+import { createUsuario, getUsuarioByCorreo } from './usuarios.service.js';
 import { pool } from '../database/database.js';
+import e from 'cors';
 
 export const getAllEmpleados = async () => {
     const [rows] = await pool.query('SELECT * FROM EMPLEADOS');
@@ -12,7 +13,16 @@ export const getEmpleadoById = async (id) => {
 };
 
 export const createEmpleado = async (empleado) => {
-    const { id_usuario, fecha_contratacion, activo, rol } = empleado;
+    const usuarioExistente = await getUsuarioByCorreo(empleado.correo);
+    let id_usuario;
+    if (usuarioExistente) {
+        id_usuario = usuarioExistente.id_usuario;
+    } else {
+        const usuario = await createUsuario(empleado);
+        id_usuario = usuario.id_usuario;
+    }
+
+    const { fecha_contratacion, activo, rol } = empleado;
     const [result] = await pool.query('INSERT INTO EMPLEADOS (id_usuario, fecha_contratacion, activo, rol) VALUES (?, ?, ?, ?)', [id_usuario, fecha_contratacion, activo, rol]);
     return { id_empleado: result.insertId, ...empleado };
 };
