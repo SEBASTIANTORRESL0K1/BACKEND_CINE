@@ -1,4 +1,4 @@
-import { createUsuario, getUsuarioByCorreo } from './usuarios.service.js';
+import { crearUsuario, obtenerUsuarioPorCorreo } from './usuarios.service.js';
 import { pool } from '../database/database.js';
 
 export const getAllClientes = async () => {
@@ -12,12 +12,12 @@ export const getClienteById = async (id) => {
 };
 
 export const createCliente = async (cliente) => {
-    const usuarioExistente = await getUsuarioByCorreo(cliente.correo);
+    const usuarioExistente = await obtenerUsuarioPorCorreo(cliente.correo);
     let id_usuario;
     if (usuarioExistente) {
         id_usuario = usuarioExistente.id_usuario;
     } else {
-        const usuario = await createUsuario(cliente);
+        const usuario = await crearUsuario(cliente);
         id_usuario = usuario.id_usuario;
     }
 

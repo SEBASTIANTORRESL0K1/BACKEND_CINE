@@ -1,6 +1,6 @@
 
 import jwt from 'jsonwebtoken';
-import {JWT_EXPIRES_IN, JWT_SECRET} from '../config.js';
+import { JWT_SECRET} from '../config.js';
 
 export const verificarToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -28,6 +28,7 @@ export const verificarToken = (req, res, next) => {
     return res.status(401).json({ message: 'Token no válido' });
   }
 };
+
 export const isAdmin = (req, res, next) => {
   // Asumiendo que verificarToken ya adjuntó el usuario a req.usuario
   if (req.usuario && req.usuario.rol === 'admin') { // Ajusta 'admin' al valor real de tu rol de administrador

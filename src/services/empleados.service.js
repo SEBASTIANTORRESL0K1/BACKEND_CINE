@@ -1,4 +1,4 @@
-import { createUsuario, getUsuarioByCorreo } from './usuarios.service.js';
+import { crearUsuario, obtenerUsuarioPorCorreo } from './usuarios.service.js';
 import { pool } from '../database/database.js';
 import e from 'cors';
 
@@ -13,12 +13,12 @@ export const getEmpleadoById = async (id) => {
 };
 
 export const createEmpleado = async (empleado) => {
-    const usuarioExistente = await getUsuarioByCorreo(empleado.correo);
+    const usuarioExistente = await obtenerUsuarioPorCorreo(empleado.correo);
     let id_usuario;
     if (usuarioExistente) {
         id_usuario = usuarioExistente.id_usuario;
     } else {
-        const usuario = await createUsuario(empleado);
+        const usuario = await crearUsuario(empleado);
         id_usuario = usuario.id_usuario;
     }
 

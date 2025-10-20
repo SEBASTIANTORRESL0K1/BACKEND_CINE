@@ -12,18 +12,18 @@ const generateToken = (usuario) => {
     );
 };
 
-export const getUsuarios = async (req, res) => {
+export const obtenerTodosLosUsuarios = async (req, res) => {
     try {
-        const usuarios = await usuariosService.getAllUsuarios();
+        const usuarios = await usuariosService.obtenerTodosLosUsuarios();
         res.json(usuarios);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-export const getUsuario = async (req, res) => {
+export const obtenerUsuarioPorId = async (req, res) => {
     try {
-        const usuario = await usuariosService.getUsuarioById(req.params.id);
+        const usuario = await usuariosService.obtenerUsuarioPorId(req.params.id);
         if (!usuario) {
             return res.status(404).json({ message: 'Usuario not found' });
         }
@@ -33,9 +33,9 @@ export const getUsuario = async (req, res) => {
     }
 };
 
-export const createUsuario = async (req, res) => {
+export const crearUsuario = async (req, res) => {
     try {
-        const newUsuario = await usuariosService.createUsuario(req.body);
+        const newUsuario = await usuariosService.crearUsuario(req.body);
         const token = generateToken(newUsuario);
         res.status(201).json({ token });
     } catch (error) {
@@ -59,18 +59,18 @@ export const loginController = async (req, res) => {
     }
 };
 
-export const updateUsuario = async (req, res) => {
+export const actualizarUsuario = async (req, res) => {
     try {
-        const updatedUsuario = await usuariosService.updateUsuario(req.params.id, req.body);
+        const updatedUsuario = await usuariosService.actualizarUsuario(req.params.id, req.body);
         res.json(updatedUsuario);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
-export const deleteUsuario = async (req, res) => {
+export const eliminarUsuario = async (req, res) => {
     try {
-        const result = await usuariosService.deleteUsuario(req.params.id);
+        const result = await usuariosService.eliminarUsuario(req.params.id);
         if (!result) {
             return res.status(404).json({ message: 'Usuario not found' });
         }

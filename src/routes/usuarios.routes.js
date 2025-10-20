@@ -1,14 +1,15 @@
+import { verificarToken, isAdmin } from '../middleware/auth.middleware.js';
 
 import { Router } from 'express';
 import * as usuariosController from '../controllers/usuarios.controller.js';
 
 const router = Router();
 
-router.get('/usuarios', usuariosController.getUsuarios);
-router.get('/usuarios/:id', usuariosController.getUsuario);
-router.post('/usuarios', usuariosController.createUsuario); // Sign-up
-router.post('/usuarios/login', usuariosController.loginController); // Login
-router.put('/usuarios/:id', usuariosController.updateUsuario);
-router.delete('/usuarios/:id', usuariosController.deleteUsuario);
+router.get('/usuarios',[verificarToken, isAdmin], usuariosController.obtenerTodosLosUsuarios);
+router.get('/usuarios/:id', [verificarToken, isAdmin],usuariosController.obtenerUsuarioPorId);
+router.post('/usuarios', [verificarToken, isAdmin],usuariosController.crearUsuario); 
+router.post('/usuarios/login', usuariosController.loginController); 
+router.put('/usuarios/:id', [verificarToken, isAdmin],usuariosController.actualizarUsuario);
+router.delete('/usuarios/:id',[verificarToken, isAdmin], usuariosController.eliminarUsuario);
 
 export default router;
