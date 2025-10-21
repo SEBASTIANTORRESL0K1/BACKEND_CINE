@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD_ADMIN}
+    ports:
+      - "${DB_PORT}:3306"
+    volumes:
+      - ./data/database.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql-data:/var/lib/mysql
+
+  api:
+    build:
+      context: ./BACKEND_CINE
+    restart: always
+    depends_on:
+      - db
+    environment:
+      API_PORT: ${API_PORT}
+      # El host de la base de datos debe ser el nombre del servicio 'db' dentro de la red de Docker
+      DB_HOST: db
+      # La API se conectará como usuario 'root' a la base de datos
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD_ADMIN}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: 3306 # El puerto interno del contenedor de la base de datos
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    volumes:
+      - ./BACKEND_CINE:/usr/src/app
+      - /usr/src/app/node_modules
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+
+volumes:
+  mysql-data:
