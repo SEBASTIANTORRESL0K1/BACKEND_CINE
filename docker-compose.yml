@@ -3,50 +3,46 @@ version: '3.8'
 services:
   db:
     image: mysql:8.0
-    command: --default-authentication-plugin=mysql_native_password
+    container_name: mysql_db_cine
     restart: always
     environment:
+      # MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
       MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD_ADMIN}
     ports:
       - "${DB_PORT}:3306"
     volumes:
-      - ./data/database.sql:/docker-entrypoint-initdb.d/init.sql
-      - mysql-data:/var/lib/mysql
+      - ./data:/docker-entrypoint-initdb.d
+  #      - mysql_data:/var/lib/mysql
 
   api:
-    build:
-      context: ./BACKEND_CINE
+    build: ./API
+    container_name: api_cine
     restart: always
-    depends_on:
-      - db
-    environment:
-      API_PORT: ${API_PORT}
-      # El host de la base de datos debe ser el nombre del servicio 'db' dentro de la red de Docker
-      DB_HOST: db
-      # La API se conectará como usuario 'root' a la base de datos
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD_ADMIN}
-      DB_NAME: ${DB_NAME}
-      DB_PORT: 3306 # El puerto interno del contenedor de la base de datos
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
     ports:
       - "${API_PORT}:${API_PORT}"
-    volumes:
-      - ./BACKEND_CINE:/usr/src/app
-      - /usr/src/app/node_modules
+    environment:
+      DB_HOST: db
+      DB_USER: root # El usuario root dentro del contenedor de mysql
+      DB_PASSWORD: ${DB_PASSWORD_ADMIN}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: 3306 # El puerto interno del contenedor de mysql
+      API_PORT: ${API_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+    depends_on:
+      - db
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
+    container_name: pma_cine
     restart: always
-    depends_on:
-      - db
     ports:
-      - "8081:80"
+      - "8082:80"
     environment:
       PMA_HOST: db
-      PMA_PORT: 3306
+    depends_on:
+      - db
 
 volumes:
-  mysql-data:
+  mysql_data:

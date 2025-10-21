@@ -1,20 +1,20 @@
-# Usa una imagen base de Node.js
+# Usar una imagen base de Node.js
 FROM node:18-alpine
 
-# Establece el directorio de trabajo en el contenedor
+# Establecer el directorio de trabajo en el contenedor
 WORKDIR /usr/src/app
 
-# Copia los archivos de definición de dependencias
+# Copiar los archivos de definición de dependencias
 COPY package*.json ./
 
-# Instala las dependencias del proyecto
+# Instalar las dependencias del proyecto
 RUN npm install
 
-# Copia el resto de los archivos de la aplicación
+# Copiar el resto de los archivos de la aplicación
 COPY . .
 
-# Expone el puerto en el que se ejecuta la aplicación
-EXPOSE 3000
+# Exponer el puerto en el que corre la API
+EXPOSE 1502
 
-# Comando para iniciar la aplicación
-CMD [ "npm", "start" ]
+# Comando para iniciar el servidor
+CMD [ "node", "server.js" ]
