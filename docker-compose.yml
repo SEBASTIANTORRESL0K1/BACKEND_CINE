@@ -1,0 +1,46 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql_db_cine
+    restart: always
+    environment:
+      # MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}  descomentar para usar contraseña
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes' #comentar para dejar de usar contraseña vacia
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:3306"
+    volumes:
+      - ./data:/docker-entrypoint-initdb.d
+  #      - mysql_data:/var/lib/mysql
+
+  api:
+    build: ./API
+    container_name: api_cine
+    restart: always
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    environment:
+      DB_HOST: db
+      DB_USER: root # El usuario root dentro del contenedor de mysql
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_PORT: 3306 # El puerto interno del contenedor de mysql
+      API_PORT: ${API_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+    depends_on:
+      - db
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma_cine
+    restart: always
+    ports:
+      - "8082:80"
+    environment:
+      PMA_HOST: db
+    depends_on:
+      - db
+
+volumes:
+  mysql_data:

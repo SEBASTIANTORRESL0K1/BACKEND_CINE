@@ -1,7 +1,8 @@
 import { Usuario } from "./USUARIO";
-export class Cliente extends Usuario {
+
+export class Empleado extends Usuario {
     constructor({ 
-        id_cliente = null, 
+        id_empleado = null, 
         id_usuario = null, 
         nombre = null, 
         primer_apellido = null, 
@@ -12,9 +13,9 @@ export class Cliente extends Usuario {
         numero_telefono = null, 
         correo = null, 
         contrasena = null, 
-        puntos, 
-        id_membresia, 
-        activo 
+        fecha_contratacion, 
+        activo, 
+        rol 
     }) {
         super({ 
             id_usuario, 
@@ -28,9 +29,9 @@ export class Cliente extends Usuario {
             correo, 
             contrasena 
         });
-        this.id_cliente = id_cliente;
-        this.puntos = puntos;
-        this.id_membresia = id_membresia;
+        this.id_empleado = id_empleado;
+        this.fecha_contratacion = fecha_contratacion;
         this.activo = activo;
+        this.rol = rol;
     }
 }
