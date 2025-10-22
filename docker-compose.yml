@@ -11,7 +11,7 @@ services:
       - "${DB_PORT}:3306"
     volumes:
       - ./data:/docker-entrypoint-initdb.d
-  #      - mysql_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
 
   api:
     build: ./API

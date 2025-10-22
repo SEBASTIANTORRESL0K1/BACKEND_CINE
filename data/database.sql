@@ -161,7 +161,28 @@ ALTER TABLE `STOCK_DULCERIA_CINES` ADD FOREIGN KEY (`id_cine`) REFERENCES `CINES
 ALTER TABLE `HISTORIAL` ADD FOREIGN KEY (`id_usuario`) REFERENCES `USUARIOS`(`id_usuario`)
 ON DELETE SET NULL ON UPDATE CASCADE;
 
+
+
 INSERT INTO `MEMBRESIAS` (`nombre`) VALUES
 ('FAN'),
 ('FANÁTICO'),
 ('SUPER FANÁTICO');
+
+INSERT INTO `CATEGORIA_DULCERIA` (`nombre`) VALUES 
+('PROMOCIONALES'),
+('NUEVOS LANZAMIENTOS'),
+('CLÁSICOS'),
+('SNACKS'),
+('PARA COMPARTIR'),
+('COMBOS'),
+('HELADOS'),
+('DULCES Y CHOCOLATES');
+
+INSERT INTO `CINES` (`nombre_cine`, `codigo_postal`) VALUES 
+('San Fernando Colima','28010'),
+('Zentralia Colima','28018'),
+('Galerías Guadalajara','41538'),
+('Andares Guadalajara','45116');
+
+INSERT INTO `USUARIOS` (`nombre`, `primer_apellido`, `segundo_apellido`, `fecha_nacimiento`, `sexo`, `codigo_postal`, `numero_telefono`, `correo`, `contrasena`) VALUES 
+('Sergio Sebastian', 'Velasco', 'Torres', '2005-02-15', 'HOMBRE', '28078', '3125949425', 'svelasco13@ucol.mx', 'VALsebs21');
