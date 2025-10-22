@@ -1,6 +1,6 @@
 import { obtenerUsuarioPorId } from './usuarios.controller.js';
 import * as clientesService from '../services/clientes.service.js';
-import {Cliente } from '../models/Cliente.js';
+import {Cliente } from '../models/CLIENTE.js';
 
 export const getClientes = async (req, res) => {
     try {
