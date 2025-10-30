@@ -13,7 +13,7 @@ RUN npm install
 COPY . .
 
 # Exponer puerto
-EXPOSE 3000
+EXPOSE 3005
 
 # Comando por defecto
-CMD ["npm start"]
+CMD ["npm","run","dev"]

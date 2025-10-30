@@ -15,6 +15,26 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - backend  
+  
+  api:
+    build: .
+    container_name: api
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=mysql
+      - DB_PORT=${MYSQL_PORT_INTERNAL}
+      - DB_USER=${MYSQL_USER}
+      - DB_PASS=${MYSQL_PASSWORD}
+      - DB_NAME=${MYSQL_DATABASE}
+    volumes:
+      - ./src:/usr/src/app/src
+    networks:
+      - backend
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
