@@ -1,0 +1,23 @@
+{
+  "name": "backend_cine",
+  "version": "1.0.0",
+  "description": "\"Contenedor para API\"",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "npm src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SEBASTIANTORRESL0K1/BACKEND_CINE.git"
+  },
+  "author": "SERGIO SEBASTIAN VELASCO TORRES",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SEBASTIANTORRESL0K1/BACKEND_CINE/issues"
+  },
+  "homepage": "https://github.com/SEBASTIANTORRESL0K1/BACKEND_CINE#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3"
+  }
+}
