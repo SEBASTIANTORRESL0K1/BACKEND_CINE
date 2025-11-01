@@ -1,5 +1,5 @@
 import express from 'express';
-import cineController from '../controllers/cine.controller.js';
+import cineController from '../controllers/cines.controller.js';
 
 const router = express.Router();
 
@@ -10,16 +10,16 @@ const router = express.Router();
 router.get('/', cineController.getAllCines);
 
 /**
- * Ruta para obtener un cine por su ID.
- * GET /cines/:id
- */
-router.get('/:id', cineController.getCineById);
-
-/**
  * Ruta para buscar cines por nombre.
  * GET /cines/search?nombre=<nombre>
  */
 router.get('/search', cineController.getCinesByName);
+
+/**
+ * Ruta para obtener un cine por su ID.
+ * GET /cines/:id
+ */
+router.get('/:id', cineController.getCineById);
 
 /**
  * Ruta para crear un nuevo cine.
@@ -31,7 +31,7 @@ router.post('/', cineController.createCine);
  * Ruta para actualizar un cine existente.
  * PATCH /cines/:id
  */
-router.patch('/:id', cineController.updateCine);
+router.patch('/:id', cineController.patchCine);
 
 /**
  * Ruta para eliminar un cine.

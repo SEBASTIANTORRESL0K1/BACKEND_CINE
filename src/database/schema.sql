@@ -172,3 +172,6 @@ ALTER TABLE `historial`
 ADD FOREIGN KEY (`id_usuario`) REFERENCES `USUARIOS`(`id_usuario`)
 ON DELETE SET NULL
 ON UPDATE CASCADE;
+
+ALTER TABLE `SALAS`
+ADD UNIQUE KEY `unique_sala` (`id_cine`, `numero_sala`);

@@ -70,19 +70,39 @@ const cineModel = {
    * @param {Object} cineData - Datos del cine a actualizar.
    * @returns {Promise<boolean>} - True si se actualizó correctamente, false si no se encontró el cine.
    */
-  patch: async (id, cineData) => {
-    try {
-      const { nombre_cine, codigo_postal } = cineData;
-      const [result] = await pool.query(
-        'UPDATE CINES SET nombre_cine = ?, codigo_postal = ? WHERE id_cine = ?',
-        [nombre_cine, codigo_postal, id]
-      );
-      return result.affectedRows > 0; // Retorna true si se actualizó al menos una fila
-    } catch (error) {
-      console.error('❌ Error en patch:', error.message);
-      throw new Error('Error al actualizar el cine');
+patch: async (id, cineData) => {
+  try {
+    // Eliminamos id_cine del objeto cineData para evitar su actualización
+    delete cineData.id_cine;
+
+    const updates = [];
+    const params = [];
+
+    if (cineData.nombre_cine !== undefined) {
+      updates.push('nombre_cine = ?');
+      params.push(cineData.nombre_cine);
     }
-  },
+
+    if (cineData.codigo_postal !== undefined) {
+      updates.push('codigo_postal = ?');
+      params.push(cineData.codigo_postal);
+    }
+
+    // Si no hay campos para actualizar, retornamos false
+    if (updates.length === 0) {
+      return false;
+    }
+
+    params.push(id); // Añadimos el ID al final de los parámetros
+    const query = `UPDATE CINES SET ${updates.join(', ')} WHERE id_cine = ?`;
+
+    const [result] = await pool.query(query, params);
+    return result.affectedRows > 0; // Retorna true si se actualizó al menos una fila
+  } catch (error) {
+    console.error('❌ Error en patch:', error.message);
+    throw new Error('Error al actualizar el cine');
+  }
+},
 
   /**
    * Elimina un cine por su ID.

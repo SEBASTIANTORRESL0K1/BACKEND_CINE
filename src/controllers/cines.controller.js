@@ -188,68 +188,85 @@ createCine: async (req, res) => {
    * @param {Object} req - Solicitud HTTP.
    * @param {Object} res - Respuesta HTTP.
    */
-  updateCine: async (req, res) => {
-    const { id } = req.params;
-    const { nombre_cine, codigo_postal } = req.body;
+patchCine: async (req, res) => {
+  const { id } = req.params;
 
-    if (!id || isNaN(id)) {
-      return res.status(400).json({
+  if (!id || isNaN(id)) {
+    return res.status(400).json({
+      success: false,
+      message: 'El ID del cine debe ser un número válido',
+    });
+  }
+
+  const { nombre_cine, codigo_postal, id_cine } = req.body;
+
+  // Validamos que el campo id_cine no esté presente
+  if (id_cine !== undefined) {
+    return res.status(400).json({
+      success: false,
+      message: 'No se permite modificar el campo id_cine',
+    });
+  }
+
+  // Validamos que al menos un campo esté presente
+  if ((!nombre_cine && !codigo_postal) || Object.keys(req.body).length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: 'Al menos un campo (nombre_cine o codigo_postal) debe ser proporcionado',
+    });
+  }
+
+  // Validamos el campo nombre_cine si está presente
+  if (nombre_cine !== undefined && (typeof nombre_cine !== 'string' || nombre_cine.trim() === '')) {
+    return res.status(400).json({
+      success: false,
+      message: 'El nombre del cine debe ser una cadena de texto válida',
+    });
+  }
+
+  // Validamos el campo codigo_postal si está presente
+  if (codigo_postal !== undefined && (codigo_postal.length !== 5 || !/^\d+$/.test(codigo_postal))) {
+    return res.status(400).json({
+      success: false,
+      message: 'El código postal debe ser una cadena de exactamente 5 dígitos',
+    });
+  }
+
+  try {
+    const cineExistente = await cineModel.findById(id);
+    if (!cineExistente) {
+      return res.status(404).json({
         success: false,
-        message: 'El ID del cine debe ser un número válido',
+        message: 'Cine no encontrado',
       });
     }
 
-    if ((!nombre_cine && !codigo_postal) || Object.keys(req.body).length === 0) {
-      return res.status(400).json({
+    // Construimos el objeto con los campos a actualizar
+    const cineData = {};
+    if (nombre_cine !== undefined) cineData.nombre_cine = nombre_cine;
+    if (codigo_postal !== undefined) cineData.codigo_postal = codigo_postal;
+
+    const actualizado = await cineModel.patch(id, cineData);
+
+    if (!actualizado) {
+      return res.status(404).json({
         success: false,
-        message: 'Al menos un campo (nombre_cine o codigo_postal) debe ser proporcionado',
+        message: 'Cine no encontrado',
       });
     }
 
-    if (nombre_cine && (typeof nombre_cine !== 'string' || nombre_cine.trim() === '')) {
-      return res.status(400).json({
-        success: false,
-        message: 'El nombre del cine debe ser una cadena de texto válida',
-      });
-    }
-
-    if (codigo_postal && (codigo_postal.length !== 5 || !/^\d+$/.test(codigo_postal))) {
-      return res.status(400).json({
-        success: false,
-        message: 'El código postal debe ser una cadena de exactamente 5 dígitos',
-      });
-    }
-
-    try {
-      const cineExistente = await cineModel.findById(id);
-      if (!cineExistente) {
-        return res.status(404).json({
-          success: false,
-          message: 'Cine no encontrado',
-        });
-      }
-
-      const actualizado = await cineModel.patch(id, { nombre_cine, codigo_postal });
-
-      if (!actualizado) {
-        return res.status(404).json({
-          success: false,
-          message: 'Cine no encontrado',
-        });
-      }
-
-      res.status(200).json({
-        success: true,
-        message: 'Cine actualizado exitosamente',
-      });
-    } catch (error) {
-      console.error('❌ Error en updateCine:', error.message);
-      res.status(500).json({
-        success: false,
-        message: 'Error al actualizar el cine',
-      });
-    }
-  },
+    res.status(200).json({
+      success: true,
+      message: 'Cine actualizado exitosamente',
+    });
+  } catch (error) {
+    console.error('❌ Error en updateCine:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error al actualizar el cine',
+    });
+  }
+},
 
   /**
    * Elimina un cine por su ID.
