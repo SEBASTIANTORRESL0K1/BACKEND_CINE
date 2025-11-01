@@ -175,3 +175,6 @@ ON UPDATE CASCADE;
 
 ALTER TABLE `SALAS`
 ADD UNIQUE KEY `unique_sala` (`id_cine`, `numero_sala`);
+
+ALTER TABLE `ASIENTOS`
+ADD UNIQUE KEY `unique_asiento` (`fila_columna`,`id_sala`);
