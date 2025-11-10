@@ -1,0 +1,1 @@
+INSERT INTO membresias (nombre) VALUES ('FAN'), ('FANATICO'), ('SUPER FANATICO');

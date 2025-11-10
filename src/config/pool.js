@@ -10,6 +10,7 @@ const pool = mysql.createPool({
   port: credentials.port,
 });
 let tryConections = 0;
+let seconds = 0;
 // Opcional: prueba conexión al iniciar
 const makeConnection = () => {
   pool.getConnection()
@@ -17,13 +18,16 @@ const makeConnection = () => {
     .catch(err => {
       console.error('❌ Error de conexión:', err);
       tryConections++;
-      if (tryConections < 5) {
-        console.log(`Intento ${tryConections} de 5`)
-        makeConnection();
-        return;
+      seconds += 10;
+      if (tryConections <= 100) {
+        setTimeout(() => {
+          console.log(`Intento ${tryConections} de 100`)
+          console.log(`Van ${seconds} segundos`)
+          makeConnection();
+        }, 10000)
+      } else {
+        process.exit(1);
       }
-
-      process.exit(1);
     });
 }
 makeConnection();

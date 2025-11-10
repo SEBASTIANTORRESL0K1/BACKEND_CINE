@@ -77,7 +77,7 @@ const usuarioModel = {
     }
     catch(error){
         console.error('Error en getByEmail:', error.message);
-        throw new Error('Error al obtener el usuario por correo',error.message);
+        throw new Error('Error al obtener el usuario por correo',error);
     }
   },
   getByPhoneNumber: async (numero_telefono)=>{
@@ -165,7 +165,7 @@ const usuarioModel = {
       const [result] = await pool.query(query, params);
       return result.affectedRows > 0; // Retorna true si se actualizó al menos una fila
     } catch (error) {
-      console.error('❌ Error en patch:', error.message);
+      console.error('❌ Error en patch:', error);
       throw new Error('Error al actualizar el usuario');
     }
   },
@@ -177,7 +177,7 @@ const usuarioModel = {
    */
   delete: async (id) => {
     try {
-      const [result] = await pool.query('DELETE usuarios WHERE id_usuario = ?', [id]);
+      const [result] = await pool.query('DELETE FROM usuarios WHERE id_usuario = ?', [id]);
       return result.affectedRows > 0; // Retorna true si se eliminó al menos una fila
     } catch (error) {
       console.error('❌ Error en delete:', error.message);
