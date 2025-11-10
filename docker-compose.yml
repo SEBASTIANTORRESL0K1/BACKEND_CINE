@@ -12,7 +12,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - ./src/database:/docker-entrypoint-initdb.d
-      - mysql_data:/var/lib/mysql
+      # - mysql_data:/var/lib/mysql
     networks:
       - backend  
   
@@ -52,9 +52,7 @@ services:
     networks:
       - backend
 
-volumes:
-  mysql_data:
-
 networks:
   backend:
     driver: bridge
+  

@@ -2,7 +2,7 @@ import express from 'express';
 import cinesRoutes from './cines.routes.js';
 import salasRoutes from './salas.routes.js';
 import asientosRoutes from './asientos.routes.js';
-
+import usuarioRoutes from './usuarios.routes.js';
 const router = express.Router();
 
 /**
@@ -13,6 +13,7 @@ const router = express.Router();
 router.use('/cines', cinesRoutes);
 router.use('/salas', salasRoutes);
 router.use('/asientos', asientosRoutes);
+router.use('/usuarios', usuarioRoutes);
 // Puedes agregar más rutas aquí para otras entidades o módulos
 // Ejemplo:
 // router.use('/otra-entidad', otraEntidadRoutes);

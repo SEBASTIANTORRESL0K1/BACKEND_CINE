@@ -9,13 +9,22 @@ const pool = mysql.createPool({
   database: credentials.database,
   port: credentials.port,
 });
-
+let tryConections = 0;
 // Opcional: prueba conexión al iniciar
-pool.getConnection()
-  .then(() => console.log('✅ Conectado a MySQL (Docker o local)'))
-  .catch(err => {
-    console.error('❌ Error de conexión:', err);
-    process.exit(1);
-  });
+const makeConnection = () => {
+  pool.getConnection()
+    .then(() => console.log('✅ Conectado a MySQL (Docker o local)'))
+    .catch(err => {
+      console.error('❌ Error de conexión:', err);
+      tryConections++;
+      if (tryConections < 5) {
+        console.log(`Intento ${tryConections} de 5`)
+        makeConnection();
+        return;
+      }
 
+      process.exit(1);
+    });
+}
+makeConnection();
 export default pool;
