@@ -5,6 +5,7 @@ import asientosRoutes from './asientos.routes.js';
 import usuarioRoutes from './usuarios.routes.js';
 import membresiasRoutes from './membresias.routes.js'
 import clientesRoutes from './clientes.routes.js'
+import reservasRoutes from './reservas.routes.js'
 const router = express.Router();
 
 /**
@@ -18,6 +19,7 @@ router.use('/asientos', asientosRoutes);
 router.use('/usuarios', usuarioRoutes);
 router.use('/membresias', membresiasRoutes);
 router.use('/clientes', clientesRoutes);
+router.use('/reservas', reservasRoutes);
 // Puedes agregar más rutas aquí para otras entidades o módulos
 // Ejemplo:
 // router.use('/otra-entidad', otraEntidadRoutes);

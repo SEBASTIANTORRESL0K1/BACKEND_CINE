@@ -7,7 +7,7 @@ const asientoModel = {
    */
   findAll: async () => {
     try {
-      const [rows] = await pool.query('SELECT * FROM ASIENTOS');
+      const [rows] = await pool.query('SELECT * FROM asientos');
       return rows;
     } catch (error) {
       console.error('❌ Error en findAll:', error.message);
@@ -22,7 +22,7 @@ const asientoModel = {
    */
   findById: async (id) => {
     try {
-      const [rows] = await pool.query('SELECT * FROM ASIENTOS WHERE id_asiento = ?', [id]);
+      const [rows] = await pool.query('SELECT * FROM asientos WHERE id_asiento = ?', [id]);
       return rows.length > 0 ? rows[0] : null;
     } catch (error) {
       console.error('❌ Error en findById:', error.message);
@@ -41,7 +41,7 @@ findBySalaId: async (salaId) => {
     //   throw new Error('El ID de la sala debe ser un número válido');
     // }
 
-    const [rows] = await pool.query('SELECT * FROM ASIENTOS WHERE id_sala = ?', [salaId]);
+    const [rows] = await pool.query('SELECT * FROM asientos WHERE id_sala = ?', [salaId]);
     return rows;
   } catch (error) {
     console.error('❌ Error en findBySalaId:', error.message);
@@ -60,7 +60,7 @@ findBySalaId: async (salaId) => {
 
       // Verificar si ya existe un asiento con la misma fila_columna e id_sala
       const [existingAsientos] = await pool.query(
-        'SELECT * FROM ASIENTOS WHERE fila_columna = ? AND id_sala = ?',
+        'SELECT * FROM asientos WHERE fila_columna = ? AND id_sala = ?',
         [fila_columna, id_sala]
       );
 
@@ -70,7 +70,7 @@ findBySalaId: async (salaId) => {
 
       // Crear el asiento
       const [result] = await pool.query(
-        'INSERT INTO ASIENTOS (fila_columna, id_sala) VALUES (?, ?)',
+        'INSERT INTO asientos (fila_columna, id_sala) VALUES (?, ?)',
         [fila_columna, id_sala]
       );
 
@@ -94,7 +94,7 @@ findBySalaId: async (salaId) => {
       // Si se proporciona fila_columna o id_sala, verificar que no exista otro asiento con esa combinación
       if (fila_columna || id_sala) {
         const [existingAsientos] = await pool.query(
-          'SELECT * FROM ASIENTOS WHERE fila_columna = ? AND id_sala = ? AND id_asiento != ?',
+          'SELECT * FROM asientos WHERE fila_columna = ? AND id_sala = ? AND id_asiento != ?',
           [fila_columna || null, id_sala || null, id]
         );
 
@@ -122,7 +122,7 @@ findBySalaId: async (salaId) => {
       }
 
       params.push(id); // Añadir el ID al final de los parámetros
-      const query = `UPDATE ASIENTOS SET ${updates.join(', ')} WHERE id_asiento = ?`;
+      const query = `UPDATE asientos SET ${updates.join(', ')} WHERE id_asiento = ?`;
 
       const [result] = await pool.query(query, params);
       return result.affectedRows > 0; // Retorna true si se actualizó al menos una fila
@@ -139,7 +139,7 @@ findBySalaId: async (salaId) => {
    */
   delete: async (id) => {
     try {
-      const [result] = await pool.query('DELETE FROM ASIENTOS WHERE id_asiento = ?', [id]);
+      const [result] = await pool.query('DELETE FROM asientos WHERE id_asiento = ?', [id]);
       return result.affectedRows > 0; // Retorna true si se eliminó al menos una fila
     } catch (error) {
       console.error('❌ Error en delete:', error.message);

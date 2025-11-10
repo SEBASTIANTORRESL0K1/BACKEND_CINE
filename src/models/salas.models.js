@@ -7,7 +7,7 @@ const salaModel = {
    */
   findAll: async () => {
     try {
-      const [rows] = await pool.query('SELECT * FROM SALAS');
+      const [rows] = await pool.query('SELECT * FROM salas');
       return rows;
     } catch (error) {
       console.error('❌ Error en findAll:', error.message);
@@ -22,7 +22,7 @@ const salaModel = {
    */
   findById: async (id) => {
     try {
-      const [rows] = await pool.query('SELECT * FROM SALAS WHERE id_sala = ?', [id]);
+      const [rows] = await pool.query('SELECT * FROM salas WHERE id_sala = ?', [id]);
       return rows.length > 0 ? rows[0] : null;
     } catch (error) {
       console.error('❌ Error en findById:', error.message);
@@ -37,7 +37,7 @@ const salaModel = {
    */
   findByCineId: async (cineId) => {
     try {
-      const [rows] = await pool.query('SELECT * FROM SALAS WHERE id_cine = ?', [cineId]);
+      const [rows] = await pool.query('SELECT * FROM salas WHERE id_cine = ?', [cineId]);
       return rows;
     } catch (error) {
       console.error('❌ Error en findByCineId:', error.message);
@@ -56,25 +56,25 @@ create: async (salaData) => {
 
     // Verificar si ya existe una sala con la misma combinación de id_cine y numero_sala
     const [existingSalas] = await pool.query(
-      'SELECT * FROM SALAS WHERE id_cine = ? AND numero_sala = ?',
+      'SELECT * FROM salas WHERE id_cine = ? AND numero_sala = ?',
       [id_cine, numero_sala]
     );
 
-    if (existingSalas.length > 0) {
-      throw new Error('Ya existe una sala con este número en el cine especificado');
+      if (existingSalas.length > 0) {
+        throw new Error('Ya existe una sala con este número en el cine especificado');
+      }
+
+      // Insertar la nueva sala
+      const [result] = await pool.query(
+        'INSERT INTO salas (id_cine, numero_sala) VALUES (?, ?)',
+        [id_cine, numero_sala]
+      );
+      return { id_sala: result.insertId, id_cine, numero_sala };
+    } catch (error) {
+      console.error('❌ Error en create:', error.message);
+      throw new Error(error.message);
     }
-
-    // Insertar la nueva sala
-    const [result] = await pool.query(
-      'INSERT INTO SALAS (id_cine, numero_sala) VALUES (?, ?)',
-      [id_cine, numero_sala]
-    );
-    return { id_sala: result.insertId, id_cine, numero_sala };
-  } catch (error) {
-    console.error('❌ Error en create:', error.message);
-    throw new Error(error.message);
-  }
-},
+  },
 
   /**
    * Actualiza una sala existente (permite modificar id_cine y numero_sala).
@@ -86,7 +86,7 @@ create: async (salaData) => {
     try {
       const { id_cine, numero_sala } = salaData;
       const [result] = await pool.query(
-        'UPDATE SALAS SET id_cine = ?, numero_sala = ? WHERE id_sala = ?',
+        'UPDATE salas SET id_cine = ?, numero_sala = ? WHERE id_sala = ?',
         [id_cine, numero_sala, id]
       );
       return result.affectedRows > 0; // Retorna true si se actualizó al menos una fila
@@ -103,7 +103,7 @@ create: async (salaData) => {
    */
   delete: async (id) => {
     try {
-      const [result] = await pool.query('DELETE FROM SALAS WHERE id_sala = ?', [id]);
+      const [result] = await pool.query('DELETE FROM salas WHERE id_sala = ?', [id]);
       return result.affectedRows > 0; // Retorna true si se eliminó al menos una fila
     } catch (error) {
       console.error('❌ Error en delete:', error.message);

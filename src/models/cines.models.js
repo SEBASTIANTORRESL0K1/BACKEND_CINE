@@ -7,7 +7,7 @@ const cineModel = {
    */
   findAll: async () => {
     try {
-      const [rows] = await pool.query('SELECT * FROM CINES');
+      const [rows] = await pool.query('SELECT * FROM cines');
       return rows;
     } catch (error) {
       console.error('❌ Error en findAll:', error.message);
@@ -22,7 +22,7 @@ const cineModel = {
    */
   findById: async (id) => {
     try {
-      const [rows] = await pool.query('SELECT * FROM CINES WHERE id_cine = ?', [id]);
+      const [rows] = await pool.query('SELECT * FROM cines WHERE id_cine = ?', [id]);
       return rows.length > 0 ? rows[0] : null;
     } catch (error) {
       console.error('❌ Error en findById:', error.message);
@@ -37,7 +37,7 @@ const cineModel = {
    */
   findByName: async (nombre) => {
     try {
-      const [rows] = await pool.query('SELECT * FROM CINES WHERE nombre_cine LIKE ?', [`%${nombre}%`]);
+      const [rows] = await pool.query('SELECT * FROM cines WHERE nombre_cine LIKE ?', [`%${nombre}%`]);
       return rows;
     } catch (error) {
       console.error('❌ Error en findByName:', error.message);
@@ -54,7 +54,7 @@ const cineModel = {
     try {
       const { nombre_cine, codigo_postal } = cineData;
       const [result] = await pool.query(
-        'INSERT INTO CINES (nombre_cine, codigo_postal) VALUES (?, ?)',
+        'INSERT INTO cines (nombre_cine, codigo_postal) VALUES (?, ?)',
         [nombre_cine, codigo_postal]
       );
       return { id_cine: result.insertId, nombre_cine, codigo_postal };
@@ -94,7 +94,7 @@ patch: async (id, cineData) => {
     }
 
     params.push(id); // Añadimos el ID al final de los parámetros
-    const query = `UPDATE CINES SET ${updates.join(', ')} WHERE id_cine = ?`;
+    const query = `UPDATE cines SET ${updates.join(', ')} WHERE id_cine = ?`;
 
     const [result] = await pool.query(query, params);
     return result.affectedRows > 0; // Retorna true si se actualizó al menos una fila
@@ -111,7 +111,7 @@ patch: async (id, cineData) => {
    */
   delete: async (id) => {
     try {
-      const [result] = await pool.query('DELETE FROM CINES WHERE id_cine = ?', [id]);
+      const [result] = await pool.query('DELETE FROM cines WHERE id_cine = ?', [id]);
       return result.affectedRows > 0; // Retorna true si se eliminó al menos una fila
     } catch (error) {
       console.error('❌ Error en delete:', error.message);
