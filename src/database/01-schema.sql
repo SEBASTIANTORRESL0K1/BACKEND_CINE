@@ -57,7 +57,7 @@ CREATE TABLE `peliculas` (
   `director` VARCHAR(50),
   `url_trailer` VARCHAR(1000),
   `genero` ENUM ('DRAMA', 'CIENCIA FICCION', 'ROMANCE', 'COMEDIA'),
-  `estado_cartelera` ENUM ('PRÓXIMAMENTE', 'ESTRENO', 'CARTELERA'),
+  `estado_cartelera` ENUM ('PROXIMAMENTE', 'ESTRENO', 'CARTELERA'),
   `fecha_inicio_estreno` DATETIME,
   `fecha_fin_estreno` DATETIME,
   `activo` TINYINT(1)
