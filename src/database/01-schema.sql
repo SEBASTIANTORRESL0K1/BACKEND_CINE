@@ -178,3 +178,6 @@ ADD UNIQUE KEY `unique_sala` (`id_cine`, `numero_sala`);
 
 ALTER TABLE `asientos`
 ADD UNIQUE KEY `unique_asiento` (`fila_columna`,`id_sala`);
+
+ALTER TABLE `funciones`
+ADD UNIQUE KEY `unique_funcion` (`id_pelicula`, `id_sala`, `fecha_hora`);
