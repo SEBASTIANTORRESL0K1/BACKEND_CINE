@@ -24,5 +24,6 @@ jobs:
             echo "=== Ejecutando script de deploy ==="
             bash ~/deploy_backendcine.sh
             echo "=== MOSTRANDO LOGS DE DOCKER ==="
+            cd ~/BACKEND_CINE
             docker compose ps
             docker compose logs --tail=50
