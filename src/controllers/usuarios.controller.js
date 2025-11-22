@@ -1,4 +1,6 @@
 import usuarioModel from "../models/usuarios.models.js";
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 
 /**
  * Controlador para manejar operaciones relacionadas con usuarios.
@@ -74,8 +76,6 @@ const usuarioController = {
         const { nombre, primer_apellido, segundo_apellido } = req.query;
 
         try {
-
-
             const usuarios = await usuarioModel.getByName(nombre, primer_apellido, segundo_apellido);
 
             if (usuarios.length === 0) {
@@ -98,6 +98,7 @@ const usuarioController = {
             });
         }
     },
+
     getUsuarioByEmail: async (req, res) => {
         const { correo } = req.query;
         try {
@@ -105,10 +106,12 @@ const usuarioController = {
             if (!usuario) {
                 throw new Error('Usuario no encontrado');
             } else {
+                // Remove password from response
+                const { contrasena, ...usuarioSinPass } = usuario;
                 res.status(200).json({
                     success: true,
                     message: 'Usuario encontrado exitosamente',
-                    data: usuario,
+                    data: usuarioSinPass,
                 });
             }
         }
@@ -120,6 +123,7 @@ const usuarioController = {
             });
         }
     },
+
     getUsuarioByPhoneNumber: async (req, res) => {
         const { numero_telefono } = req.query;
         try {
@@ -202,7 +206,6 @@ const usuarioController = {
         }
 
         try {
-
             const usuarioExistenteCorreo = await usuarioModel.getByEmail(correo);
             if (usuarioExistenteCorreo) {
                 throw new Error('El correo electrónico ya está registrado');
@@ -211,13 +214,17 @@ const usuarioController = {
             if (usuarioExistenteTelefono) {
                 throw new Error('El número de teléfono ya está registrado');
             }
+
             // Crear el usuario
             const nuevoUsuario = await usuarioModel.create(req.body);
+
+            // Remove password from response
+            const { contrasena: pass, ...usuarioResponse } = nuevoUsuario;
 
             res.status(201).json({
                 success: true,
                 message: 'Usuario creado exitosamente',
-                data: nuevoUsuario,
+                data: usuarioResponse,
             });
         } catch (error) {
             console.error('❌ Error en createUsuario:', error.message);
@@ -319,6 +326,113 @@ const usuarioController = {
             });
         }
     },
+
+    /**
+     * Registra un nuevo usuario y devuelve un token JWT.
+     */
+    signUp: async (req, res) => {
+        // Reutilizamos la lógica de validación y creación de createUsuario
+        // pero devolvemos un token al final.
+
+        // Validación del cuerpo de la solicitud
+        if (!req.body || Object.keys(req.body).length === 0) {
+            return res.status(400).json({ success: false, message: 'El cuerpo de la solicitud no puede estar vacío' });
+        }
+
+        const { nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, codigo_postal, numero_telefono, correo, contrasena } = req.body;
+
+        // Validaciones básicas (se pueden refactorizar para compartir con createUsuario)
+        if (!nombre || !primer_apellido || !segundo_apellido || !fecha_nacimiento || !sexo || !codigo_postal || !numero_telefono || !correo || !contrasena) {
+            return res.status(400).json({ success: false, message: 'Todos los campos son obligatorios' });
+        }
+        if (!/\S+@\S+\.\S+/.test(correo)) {
+            return res.status(400).json({ success: false, message: 'Email inválido' });
+        }
+
+        try {
+            const usuarioExistenteCorreo = await usuarioModel.getByEmail(correo);
+            if (usuarioExistenteCorreo) return res.status(400).json({ success: false, message: 'El correo ya está registrado' });
+
+            const usuarioExistenteTelefono = await usuarioModel.getByPhoneNumber(numero_telefono);
+            if (usuarioExistenteTelefono) return res.status(400).json({ success: false, message: 'El teléfono ya está registrado' });
+
+            const nuevoUsuario = await usuarioModel.create(req.body);
+
+            // Generar Token
+            // Al registrarse, por defecto no tiene roles a menos que se asignen en otra tabla.
+            // Asumiremos rol 'cliente' si se crea automáticamente en la tabla clientes, 
+            // pero el modelo create solo inserta en usuarios.
+            // Para este caso, roles estará vacío o se deberá insertar en clientes.
+            // TODO: Insertar en tabla clientes automáticamente si es un registro de cliente?
+            // Por ahora devolvemos roles vacíos o verificamos.
+            const roles = await usuarioModel.getRoles(nuevoUsuario.id_usuario);
+
+            const token = jwt.sign(
+                { id: nuevoUsuario.id_usuario, roles },
+                process.env.JWT_SECRET || 'secret_key',
+                { expiresIn: '2h' }
+            );
+
+            const { contrasena: pass, ...usuarioResponse } = nuevoUsuario;
+
+            res.status(201).json({
+                success: true,
+                message: 'Usuario registrado exitosamente',
+                token,
+                user: usuarioResponse,
+                roles
+            });
+
+        } catch (error) {
+            console.error('❌ Error en signUp:', error.message);
+            res.status(500).json({ success: false, message: 'Error en el registro', error: error.message });
+        }
+    },
+
+    /**
+     * Inicia sesión y devuelve un token JWT.
+     */
+    login: async (req, res) => {
+        const { correo, contrasena } = req.body;
+
+        if (!correo || !contrasena) {
+            return res.status(400).json({ success: false, message: 'Correo y contraseña son obligatorios' });
+        }
+
+        try {
+            const usuario = await usuarioModel.getByEmail(correo);
+            if (!usuario) {
+                return res.status(401).json({ success: false, message: 'Credenciales inválidas' });
+            }
+
+            const isMatch = await bcrypt.compare(contrasena, usuario.contrasena);
+            if (!isMatch) {
+                return res.status(401).json({ success: false, message: 'Credenciales inválidas' });
+            }
+
+            const roles = await usuarioModel.getRoles(usuario.id_usuario);
+
+            const token = jwt.sign(
+                { id: usuario.id_usuario, roles },
+                process.env.JWT_SECRET || 'secret_key',
+                { expiresIn: '2h' }
+            );
+
+            const { contrasena: pass, ...usuarioResponse } = usuario;
+
+            res.status(200).json({
+                success: true,
+                message: 'Inicio de sesión exitoso',
+                token,
+                user: usuarioResponse,
+                roles
+            });
+
+        } catch (error) {
+            console.error('❌ Error en login:', error.message);
+            res.status(500).json({ success: false, message: 'Error en el inicio de sesión' });
+        }
+    }
 };
 
 export default usuarioController;

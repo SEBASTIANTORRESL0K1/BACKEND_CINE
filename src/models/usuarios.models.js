@@ -70,24 +70,48 @@ const usuarioModel = {
       throw new Error('Error al buscar usuarios por nombre/apellidos');
     }
   },
-  getByEmail: async (correo) =>{
-    try{
-        const [rows] = await pool.query('SELECT id_usuario, nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, codigo_postal, numero_telefono, correo FROM usuarios WHERE correo = ?',[correo]);
-        return rows.length > 0 ? rows[0] : null;
-    }
-    catch(error){
-        console.error('Error en getByEmail:', error.message);
-        throw new Error('Error al obtener el usuario por correo',error);
+
+  getByEmail: async (correo) => {
+    try {
+      // Select password as well for login verification
+      const [rows] = await pool.query('SELECT * FROM usuarios WHERE correo = ?', [correo]);
+      return rows.length > 0 ? rows[0] : null;
+    } catch (error) {
+      console.error('Error en getByEmail:', error.message);
+      throw new Error('Error al obtener el usuario por correo');
     }
   },
-  getByPhoneNumber: async (numero_telefono)=>{
-    try{
-        const [rows]= await pool.query('SELECT id_usuario, nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, codigo_postal, numero_telefono, correo FROM usuarios WHERE numero_telefono = ?',[numero_telefono]);
-        return rows.length > 0 ? rows[0] : null;
+
+  getByPhoneNumber: async (numero_telefono) => {
+    try {
+      const [rows] = await pool.query('SELECT id_usuario, nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, codigo_postal, numero_telefono, correo FROM usuarios WHERE numero_telefono = ?', [numero_telefono]);
+      return rows.length > 0 ? rows[0] : null;
+    } catch (error) {
+      console.error('Error en getByPhoneNumber:', error.message);
+      throw new Error('Error al obtener el usuario por numero de telefono');
     }
-    catch(error){
-        console.error('Error en getByPhoneNumber:', error.message);
-        throw new Error('Error al obtener el usuario por numero de telefono', error.message);
+  },
+
+  getRoles: async (id_usuario) => {
+    try {
+      const roles = [];
+
+      // Check if user is an employee
+      const [empleadoRows] = await pool.query('SELECT rol FROM empleados WHERE id_usuario = ? AND activo = 1', [id_usuario]);
+      if (empleadoRows.length > 0) {
+        roles.push(empleadoRows[0].rol); // 'admin', 'editor', 'visualizador'
+      }
+
+      // Check if user is a client
+      const [clienteRows] = await pool.query('SELECT id_cliente FROM clientes WHERE id_usuario = ? AND activo = 1', [id_usuario]);
+      if (clienteRows.length > 0) {
+        roles.push('cliente');
+      }
+
+      return roles;
+    } catch (error) {
+      console.error('Error en getRoles:', error.message);
+      throw new Error('Error al obtener roles del usuario');
     }
   },
 
