@@ -2,21 +2,27 @@ name: Deploy BackendCine
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-      - name: SSH to server and deploy
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v1
         with:
-          host: 3.128.200.224
-          username: bitnami
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
           script: |
+            echo "=== Ejecutando script de deploy ==="
             bash ~/deploy_backendcine.sh
+            echo "=== MOSTRANDO LOGS DE DOCKER ==="
+            docker compose ps
+            docker compose logs --tail=50
