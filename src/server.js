@@ -16,4 +16,5 @@ app.use('/', routes);
 // Iniciar el servidor
 app.listen(PORT, () => {
   console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
-  console.log(`probando`)
+  console.log(`probando`);
+})
