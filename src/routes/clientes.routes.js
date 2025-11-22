@@ -1,36 +1,30 @@
 import express from 'express';
 import clienteController from '../controllers/clientes.controller.js';
+import authMiddleware from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
 /**
- * Ruta para obtener todos los clientes.
- * GET /clientes
+ * Rutas para operaciones relacionadas con clientes.
  */
+
+// Autenticación para Clientes (Sign Up)
+// Middleware valida y crea usuario -> Controller crea cliente y responde con token
+router.post('/signup', authMiddleware.signUp, clienteController.signUpCliente);
+
+// Obtener todos los clientes
 router.get('/', clienteController.getAllClientes);
 
-/**
- * Ruta para obtener un cliente por su ID.
- * GET /clientes/:id
- */
+// Obtener un cliente por su ID
 router.get('/:id', clienteController.getClienteById);
 
-/**
- * Ruta para crear un nuevo cliente.
- * POST /clientes
- */
+// Crear un nuevo cliente (Admin usage, sin auth flow)
 router.post('/', clienteController.createCliente);
 
-/**
- * Ruta para actualizar un cliente existente.
- * PATCH /clientes/:id
- */
+// Actualizar un cliente existente
 router.patch('/:id', clienteController.patchCliente);
 
-/**
- * Ruta para eliminar un cliente por su ID.
- * DELETE /clientes/:id
- */
+// Eliminar un cliente por su ID
 router.delete('/:id', clienteController.deleteCliente);
 
 export default router;

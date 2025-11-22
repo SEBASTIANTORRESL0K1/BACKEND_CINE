@@ -55,8 +55,18 @@ const clienteModel = {
       const { id_usuario, puntos, id_membresia, activo } = clienteData;
 
       // Validar campos obligatorios
-      if (!id_usuario || !puntos || !id_membresia || typeof activo !== 'boolean') {
+      if (!id_usuario || !id_membresia) {
         throw new Error('Todos los campos son obligatorios y deben ser válidos');
+      }
+
+      // Ensure puntos is a number (can be 0)
+      if (typeof puntos !== 'number') {
+        throw new Error('Puntos debe ser un número');
+      }
+
+      // Ensure activo is boolean or number (can be false or 0)
+      if (activo === undefined || activo === null) {
+        throw new Error('Activo es obligatorio');
       }
 
       // Verificar si ya existe un cliente con el mismo id_usuario
@@ -69,7 +79,7 @@ const clienteModel = {
       // Crear el cliente
       const [result] = await pool.query(
         'INSERT INTO clientes (id_usuario, puntos, id_membresia, activo) VALUES (?, ?, ?, ?)',
-        [id_usuario, 0, id_membresia, activo]
+        [id_usuario, puntos, id_membresia, activo]
       );
 
       return { id_cliente: result.insertId, id_usuario, puntos, id_membresia, activo };

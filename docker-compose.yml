@@ -14,12 +14,13 @@ services:
       - ./src/database:/docker-entrypoint-initdb.d
       # - mysql_data:/var/lib/mysql
     networks:
-      - backend  
-  
+      - backend
+
   api:
     build: .
     container_name: api
     restart: always
+    command: sh -c "npm run hash-passwords && npm run dev"
     depends_on:
       - mysql
     ports:
@@ -55,4 +56,3 @@ services:
 networks:
   backend:
     driver: bridge
-  

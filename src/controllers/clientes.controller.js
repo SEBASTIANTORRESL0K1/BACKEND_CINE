@@ -1,10 +1,61 @@
 import clienteModel from "../models/clientes.models.js";
 import usuarioModel from "../models/usuarios.models.js";
+import jwt from 'jsonwebtoken';
 
 /**
  * Controlador para manejar operaciones relacionadas con clientes.
  */
 const clienteController = {
+  /**
+   * Registra un nuevo cliente (Flujo de Sign Up).
+   * Se asume que el middleware de auth ya validó los datos del usuario.
+   * Este método crea el usuario, luego crea el cliente asociado y devuelve el token.
+   */
+  signUpCliente: async (req, res) => {
+    try {
+      // 1. Crear el usuario (La validación ya la hizo el middleware)
+      // Nota: El middleware authMiddleware.signUp valida pero NO crea el usuario, pasa al siguiente.
+      // Así que aquí creamos el usuario primero.
+      const nuevoUsuario = await usuarioModel.create(req.body);
+
+      // 2. Crear el cliente asociado
+      // Asumimos valores por defecto para un nuevo registro de cliente
+      const clienteData = {
+        id_usuario: nuevoUsuario.id_usuario,
+        puntos: 0,
+        id_membresia: 1, // Asumimos membresía 1 (FAN) por defecto, o null si es opcional
+        activo: 1 // Activo por defecto
+      };
+
+      const nuevoCliente = await clienteModel.create(clienteData);
+
+      // 3. Generar Token
+      // Ahora el rol es explícitamente 'cliente'
+      const roles = ['cliente'];
+
+      const token = jwt.sign(
+        { id: nuevoUsuario.id_usuario, roles },
+        process.env.JWT_SECRET || 'secret_key',
+        { expiresIn: '2h' }
+      );
+
+      const { contrasena: pass, ...usuarioResponse } = nuevoUsuario;
+
+      res.status(201).json({
+        success: true,
+        message: 'Cliente registrado exitosamente',
+        token,
+        user: usuarioResponse,
+        cliente: nuevoCliente,
+        roles
+      });
+
+    } catch (error) {
+      console.error('❌ Error en signUpCliente:', error.message);
+      res.status(500).json({ success: false, message: 'Error en el registro del cliente', error: error.message });
+    }
+  },
+
   /**
    * Obtiene todos los clientes.
    * @param {Object} req - Solicitud HTTP.
@@ -16,7 +67,7 @@ const clienteController = {
       res.status(200).json({
         success: true,
         message: 'Lista de clientes obtenida exitosamente',
-         clientes,
+        clientes,
       });
     } catch (error) {
       console.error('❌ Error en getAllClientes:', error.message);
@@ -55,7 +106,7 @@ const clienteController = {
       res.status(200).json({
         success: true,
         message: 'Cliente encontrado exitosamente',
-         cliente,
+        cliente,
       });
     } catch (error) {
       console.error('❌ Error en getClienteById:', error.message);
@@ -67,7 +118,7 @@ const clienteController = {
   },
 
   /**
-   * Crea un nuevo cliente.
+   * Crea un nuevo cliente (Admin usage).
    * @param {Object} req - Solicitud HTTP.
    * @param {Object} res - Respuesta HTTP.
    */
@@ -121,9 +172,9 @@ const clienteController = {
       // Crear el cliente
       const clienteData = {
         id_usuario,
-        puntos,
-        id_membresia,
-        activo,
+        puntos: puntos || 0,
+        id_membresia: id_membresia || 1,
+        activo: activo !== undefined ? activo : true,
       };
 
       const nuevoCliente = await clienteModel.create(clienteData);
@@ -131,7 +182,7 @@ const clienteController = {
       res.status(201).json({
         success: true,
         message: 'Cliente creado exitosamente',
-         nuevoCliente,
+        nuevoCliente,
       });
     } catch (error) {
       console.error('❌ Error en createCliente:', error.message);

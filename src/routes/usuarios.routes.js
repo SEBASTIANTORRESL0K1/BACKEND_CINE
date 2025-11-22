@@ -1,5 +1,6 @@
 import express from 'express';
 import usuarioController from '../controllers/usuarios.controller.js';
+import authMiddleware from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
@@ -7,13 +8,18 @@ const router = express.Router();
  * Rutas para operaciones relacionadas con usuarios.
  */
 
+// Autenticación
+// Login: Middleware valida y responde
+router.post('/login', authMiddleware.login);
+
 // Obtener todos los usuarios
 router.get('/', usuarioController.getAllUsuarios);
 // Buscar usuarios por nombre, primer apellido y/o segundo apellido
 router.get('/search', usuarioController.getUsuariosByName);
 router.get('/correo', usuarioController.getUsuarioByEmail);
 router.get('/telefono', usuarioController.getUsuarioByPhoneNumber);
-// Obtener un usuario por su ID
+
+// Obtener un usuario por su ID (Ruta dinámica, debe ir después de las específicas)
 router.get('/:id', usuarioController.getUsuarioById);
 
 // Crear un nuevo usuario (Admin usage mostly)
@@ -24,9 +30,5 @@ router.patch('/:id', usuarioController.patchUsuario);
 
 // Eliminar un usuario por su ID
 router.delete('/:id', usuarioController.deleteUsuario);
-
-// Autenticación
-router.post('/signup', usuarioController.signUp);
-router.post('/login', usuarioController.login);
 
 export default router;

@@ -1,6 +1,5 @@
 import usuarioModel from "../models/usuarios.models.js";
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
 
 /**
  * Controlador para manejar operaciones relacionadas con usuarios.
@@ -328,43 +327,14 @@ const usuarioController = {
     },
 
     /**
-     * Registra un nuevo usuario y devuelve un token JWT.
+     * Finaliza el proceso de registro (SignUp) después de que el middleware haya validado.
+     * Crea el usuario y devuelve el token.
      */
-    signUp: async (req, res) => {
-        // Reutilizamos la lógica de validación y creación de createUsuario
-        // pero devolvemos un token al final.
-
-        // Validación del cuerpo de la solicitud
-        if (!req.body || Object.keys(req.body).length === 0) {
-            return res.status(400).json({ success: false, message: 'El cuerpo de la solicitud no puede estar vacío' });
-        }
-
-        const { nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, codigo_postal, numero_telefono, correo, contrasena } = req.body;
-
-        // Validaciones básicas (se pueden refactorizar para compartir con createUsuario)
-        if (!nombre || !primer_apellido || !segundo_apellido || !fecha_nacimiento || !sexo || !codigo_postal || !numero_telefono || !correo || !contrasena) {
-            return res.status(400).json({ success: false, message: 'Todos los campos son obligatorios' });
-        }
-        if (!/\S+@\S+\.\S+/.test(correo)) {
-            return res.status(400).json({ success: false, message: 'Email inválido' });
-        }
-
+    completeSignUp: async (req, res) => {
         try {
-            const usuarioExistenteCorreo = await usuarioModel.getByEmail(correo);
-            if (usuarioExistenteCorreo) return res.status(400).json({ success: false, message: 'El correo ya está registrado' });
-
-            const usuarioExistenteTelefono = await usuarioModel.getByPhoneNumber(numero_telefono);
-            if (usuarioExistenteTelefono) return res.status(400).json({ success: false, message: 'El teléfono ya está registrado' });
-
+            // El middleware ya validó, así que procedemos a crear
             const nuevoUsuario = await usuarioModel.create(req.body);
 
-            // Generar Token
-            // Al registrarse, por defecto no tiene roles a menos que se asignen en otra tabla.
-            // Asumiremos rol 'cliente' si se crea automáticamente en la tabla clientes, 
-            // pero el modelo create solo inserta en usuarios.
-            // Para este caso, roles estará vacío o se deberá insertar en clientes.
-            // TODO: Insertar en tabla clientes automáticamente si es un registro de cliente?
-            // Por ahora devolvemos roles vacíos o verificamos.
             const roles = await usuarioModel.getRoles(nuevoUsuario.id_usuario);
 
             const token = jwt.sign(
@@ -384,53 +354,8 @@ const usuarioController = {
             });
 
         } catch (error) {
-            console.error('❌ Error en signUp:', error.message);
+            console.error('❌ Error en completeSignUp:', error.message);
             res.status(500).json({ success: false, message: 'Error en el registro', error: error.message });
-        }
-    },
-
-    /**
-     * Inicia sesión y devuelve un token JWT.
-     */
-    login: async (req, res) => {
-        const { correo, contrasena } = req.body;
-
-        if (!correo || !contrasena) {
-            return res.status(400).json({ success: false, message: 'Correo y contraseña son obligatorios' });
-        }
-
-        try {
-            const usuario = await usuarioModel.getByEmail(correo);
-            if (!usuario) {
-                return res.status(401).json({ success: false, message: 'Credenciales inválidas' });
-            }
-
-            const isMatch = await bcrypt.compare(contrasena, usuario.contrasena);
-            if (!isMatch) {
-                return res.status(401).json({ success: false, message: 'Credenciales inválidas' });
-            }
-
-            const roles = await usuarioModel.getRoles(usuario.id_usuario);
-
-            const token = jwt.sign(
-                { id: usuario.id_usuario, roles },
-                process.env.JWT_SECRET || 'secret_key',
-                { expiresIn: '2h' }
-            );
-
-            const { contrasena: pass, ...usuarioResponse } = usuario;
-
-            res.status(200).json({
-                success: true,
-                message: 'Inicio de sesión exitoso',
-                token,
-                user: usuarioResponse,
-                roles
-            });
-
-        } catch (error) {
-            console.error('❌ Error en login:', error.message);
-            res.status(500).json({ success: false, message: 'Error en el inicio de sesión' });
         }
     }
 };
