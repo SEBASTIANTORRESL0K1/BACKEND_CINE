@@ -304,3 +304,59 @@ INSERT INTO `funciones` (`id_sala`, `id_pelicula`, `fecha_hora`, `precio`)
 VALUES (22, 3, '2025-11-30 21:30:00', 80.00);
 INSERT INTO `funciones` (`id_sala`, `id_pelicula`, `fecha_hora`, `precio`) 
 VALUES (24, 2, '2025-12-01 18:00:00', 95.00);
+-- *******************************************
+-- *********** INSERTS DE VENTAS *************
+-- *******************************************
+
+-- Venta 1: Cliente 1 compra boletos y un snack (Total: 85.00 + 85.00 + 455.00 = 625.00)
+-- 1. Crear la Venta Maestra (La fecha y hora se asignan automáticamente en el servidor)
+INSERT INTO `ventas` (`id_cliente`, `total`)
+VALUES (1, 625.00); 
+
+-- 2. Detalle de Venta 1 (Boletos para Función 1)
+-- Asumo que la Venta 1 tiene id_venta = 1.
+-- 2 boletos para Función 1 (ID_ASIENTO: 1, 2. PRECIO: 85.00 c/u)
+INSERT INTO `detalle_venta` (`id_venta`, `cantidad`, `precio`, `id_funcion`, `id_asiento`, `id_dulce`, `tipo_item`, `subtotal`)
+VALUES (1, 1, 85.00, 1, 1, NULL, 'FUNCION', 85.00);
+
+INSERT INTO `detalle_venta` (`id_venta`, `cantidad`, `precio`, `id_funcion`, `id_asiento`, `id_dulce`, `tipo_item`, `subtotal`)
+VALUES (1, 1, 85.00, 1, 2, NULL, 'FUNCION', 85.00);
+
+-- 3. Detalle de Venta 2 (Dulce)
+-- 1 Palomero Teléfono Negro (ID_DULCE: 2. PRECIO: 455.00)
+INSERT INTO `detalle_venta` (`id_venta`, `cantidad`, `precio`, `id_funcion`, `id_asiento`, `id_dulce`, `tipo_item`, `subtotal`)
+VALUES (1, 1, 455.00, NULL, NULL, 2, 'DULCE', 455.00);
+
+-- -----------------------------------------------------
+
+-- Venta 2: Cliente 1 compra boletos para dos funciones diferentes (Total: 95.00 + 70.00 = 165.00)
+-- 1. Crear la Venta Maestra (Asumo que la Venta 2 tendrá id_venta = 2)
+INSERT INTO `ventas` (`id_cliente`, `total`)
+VALUES (1, 165.00); 
+
+-- 2. Detalle de Venta 1 (Boleto Función 3)
+-- 1 boleto para Función 3 (ID_ASIENTO: 10. PRECIO: 95.00)
+INSERT INTO `detalle_venta` (`id_venta`, `cantidad`, `precio`, `id_funcion`, `id_asiento`, `id_dulce`, `tipo_item`, `subtotal`)
+VALUES (2, 1, 95.00, 3, 10, NULL, 'FUNCION', 95.00);
+
+-- 3. Detalle de Venta 2 (Boleto Función 4)
+-- 1 boleto para Función 4 (ID_ASIENTO: 11. PRECIO: 70.00)
+INSERT INTO `detalle_venta` (`id_venta`, `cantidad`, `precio`, `id_funcion`, `id_asiento`, `id_dulce`, `tipo_item`, `subtotal`)
+VALUES (2, 1, 70.00, 4, 11, NULL, 'FUNCION', 70.00);
+
+-- -----------------------------------------------------
+
+-- Venta 3: Cliente 1 compra 5 chocolates y 1 boleto (Total: (5 * 38.00) + 90.00 = 280.00)
+-- 1. Crear la Venta Maestra (Asumo que la Venta 3 tendrá id_venta = 3)
+INSERT INTO `ventas` (`id_cliente`, `total`)
+VALUES (1, 280.00); 
+
+-- 2. Detalle de Venta 1 (Dulce: Snickers)
+-- 5 Snickers (ID_DULCE: 48. PRECIO: 38.00 c/u)
+INSERT INTO `detalle_venta` (`id_venta`, `cantidad`, `precio`, `id_funcion`, `id_asiento`, `id_dulce`, `tipo_item`, `subtotal`)
+VALUES (3, 5, 38.00, NULL, NULL, 48, 'DULCE', 190.00);
+
+-- 3. Detalle de Venta 2 (Boleto Función 10)
+-- 1 boleto para Función 10 (ID_ASIENTO: 4. PRECIO: 90.00)
+INSERT INTO `detalle_venta` (`id_venta`, `cantidad`, `precio`, `id_funcion`, `id_asiento`, `id_dulce`, `tipo_item`, `subtotal`)
+VALUES (3, 1, 90.00, 10, 4, NULL, 'FUNCION', 90.00);
