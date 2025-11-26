@@ -17,7 +17,7 @@ const ventasModel = {
     // Obtener una venta por ID
     getById: async (id_venta) => {
         try {
-            const { rows } = await pool.query("SELECT * FROM ventas WHERE id_venta = $1", [id_venta]);
+            const { rows } = await pool.query("SELECT * FROM ventas WHERE id_venta = ?", [id_venta]);
 
             if (rows.length === 0) {
                 return null; // No se encontró la venta
